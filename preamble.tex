@@ -11,9 +11,24 @@
 \usepackage{multirow}
 \usepackage{caption}
 \usepackage{color}
-
-
 \usepackage{multicol}
+
+\RequirePackage{booktabs}
+
+
+
+
+
+% The mathtools package provides facilities for many mathematical tasks.
+% In particular, it sets up nice commands for formatting braces.
+\DeclarePairedDelimiter{\pbrac}{(}{)}
+\DeclarePairedDelimiter{\sbrac}{[}{]}
+\DeclarePairedDelimiter{\cbrac}{\{}{\}}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+\DeclarePairedDelimiter{\inner}{\langle}{\rangle}
 
 \theoremstyle{plain}
 \newtheorem{claim}{\protect\claimname}
@@ -305,7 +320,7 @@
 \newcommand{\bmax}{b_{\mathrm{max}}}
 \newcommand{\sigbeta}{\sigma_{\beta}}
 \newcommand{\siglv}{\sigma_{\sdif}}
-\newcommand{\Tr}{\mathrm{Tr}}
+%\newcommand{\Tr}{\mathrm{Tr}}
 
 \newcommand{\sign}{\mathrm{sign}}
 \newcommand{\SNRdB}{\mathrm{SNR}_{\mathrm{dB}}}
@@ -349,8 +364,8 @@
 %
 % From Expanders_FOCS
 %
-\newcommand{\Bernoulli}{\mathrm{Bernoulli}}
-\newcommand{\Binomial}{\mathrm{Binomial}}
+%\newcommand{\Bernoulli}{\mathrm{Bernoulli}}
+%\newcommand{\Binomial}{\mathrm{Binomial}}
 \newcommand{\imtil}{\tilde{\imath}}
 \newcommand{\SNR}{\mathrm{SNR}}
 
@@ -510,6 +525,7 @@
 \newcommand{\CC}{\mathbb{C}}
 \newcommand{\EE}{\mathbb{E}}
 \newcommand{\KK}{\mathbb{K}}
+\newcommand{\NN}{\mathbb{N}}
 \newcommand{\PP}{\mathbb{P}}
 \newcommand{\RR}{\mathbb{R}}
 \newcommand{\ZZ}{\mathbb{Z}}
@@ -730,9 +746,16 @@
 \newcommand{\Ezxicc}{E_{0,x_{i}}^{\mathrm{cc}}}
 \newcommand{\Rcrsa}{R_{s,a}^{\mathrm{cr}}}
 
+%inner product
+
+
 %
 % For FYP
 %
 \newcommand{\RKHSGauss}{\mathcal{H}_\infty}
 \newcommand{\half}{\frac{1}{2}}
 \newcommand{\Trans}{\text{T}}
+\newcommand{\HH}{\mathcal{H}}
+\newcommand{\PPP}{\mathcal{P}}
+\newcommand{\nonNegInt}{\ZZ^+ \cup \{0\}}
+\newcommand{\fillDist}{h_{X,\Omega}}
