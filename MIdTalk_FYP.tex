@@ -1,0 +1,221 @@
+\documentclass{beamer}
+
+%\usepackage[utf8]{inputenc}
+\usepackage[english]{babel} 
+\usetheme{Madrid}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+\setitemize{label=\usebeamerfont*{itemize item}%
+	\usebeamercolor[fg]{itemize item}
+	\usebeamertemplate{itemize item}}
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+
+\newcommand\norm[1]{\left\lVert#1\right\rVert}
+\newcommand\inner[1]{\langle#1\rangle}
+
+\input{preamble}
+%Information to be included in the title page:
+\title[Introductory Talk] %optional
+{Overfitting and Generalization Performance}
+
+
+
+
+
+\begin{document}
+	
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Main Papers}
+\begin{itemize}
+	\item \textit{Reconciling modern machine-learning practice and the classical bias-variance trade-off}, Belkin et al
+	\item \textit{To undersand deep learning we need to understand kernel learning}, Belkin et al
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Introduction}
+	
+	\begin{block}{General Aim}
+		Given training sample \[(x_1, y_1), ..., (x_n, y_n) \in \mathbb{R}^d \times \mathbb{R}\]
+		learn a predictor 
+		$h_n : \mathbb{R}^d \to \mathbb{R}$ that predicts $y$ given new $x$.
+	\end{block}
+	
+	\begin{block}{Empirical Risk Minimization (ERM)}
+		Minimize training risk:
+		$\frac{1}{n} \sum_{i=1}^{n}\ell(h(x_i), y_i) $
+		given a loss function $\ell$.
+	\end{block}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Generalization}
+
+\begin{itemize}[itemsep = 12pt]
+	\item Find $h_n$ that performs well on unseen data.
+	\item Minimize true risk: $h^*(x) = \argmin_h \EE[\ell (h(x), y)]$ where  $(x, y)$ drawn independently from $P$.
+	\item ERM goal: $h^*_{ERM}(x) = \argmin_{h \in \mathcal{H}} \frac{1}{n} \sum_{i=1}^{n}\ell(h(x_i), y_i) $
+	\item $\mathcal{H}$ is a function class that contains functions approximating $h^*$.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{"Classical" thinking}
+\begin{itemize}[itemsep = 12pt]
+	\item Finding a balance between underfitting and overfitting.
+	\item "Bias-Variance Tradeoff"
+	\item 0 training error does not tend to generalize well.
+	\item Control function class $\mathcal{H}$ implicitly or explicitly.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Generalization of performance}
+\includegraphics[height=6cm]{UCurve.png}
+\\Classical curve from bias variance tradeoff.
+\end{frame}
+
+\begin{frame}
+\frametitle{Modern practice}
+\begin{itemize}[itemsep = 12pt]
+	\item Modern ML methods such as large neural networks and other non-linear predictors have very low to no training risk
+	\item NN architectures chosen such that interpolation can be achieved.
+	\item Works even when training data have high levels of noise.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\includegraphics[width=11cm]{Good_Interpolation_Zhang.png}
+\\ \textit{Understanding Deep Learning Requires Rethinking Generalization, Zhang et al} 
+\end{frame}
+
+\begin{frame}
+\frametitle{"Double Descent"}
+\begin{itemize}[itemsep = 12pt]
+	\item "Double Descent" curve proposed and empirically observed to some extent.
+	\item Curve the extends beyond the point of interpolation
+	\item Risk decreases beyond this point, typically surpassing performance of classical stopping point.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Double Descent Curve}
+\includegraphics[height=5cm]{Double-Descent-Curve.png}
+\end{frame}
+
+\begin{frame}
+\frametitle{Explanations on Double Descent}
+Why should the test risk decrease even when empirical risk stays the same?\\
+\begin{itemize}[itemsep = 12pt]
+	\item Capacity of function class needs not suit the appropriate inductive bias for the problem.
+	\item By having a larger function class, may find a function that matches the inductive bias better.
+	\item Eg., smoother function, smaller norm, larger margin.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Short introduction to Kernels and RKHS}
+\begin{itemize}[itemsep = 12pt]
+	\item For kernel $k: X \times X \rightarrow \KK $, there exists $\KK$-Hilbert space $H$ and map $\psi:X \rightarrow H$ such that for all $x_1, x_2 \in X$,
+	\[ k(x_1, x_2) = \inner{\psi(x_2), \psi(x_1)}. \] 
+	\item $\psi$ is called a feature map of $k$.
+	\item Gaussian RBF kernel with width $\gamma$:
+	\[ k_{\gamma, \CC^d}(x, x') := e^{\frac{-\norm{x - x'}_2^2}{\gamma^2}}. \]
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Short introduction to Kernels and RKHS}
+Let $H$ be a $\KK$-Hilbert space, consisting of functions $f: X \rightarrow K$.
+\begin{itemize}
+	\item Function $k:X \times X \rightarrow \KK$ is a reproducing kernel of $H$ if $f(x) = \inner{f, k(\cdot, x)} ~ \forall f \in H, ~ \forall  x \in X $ 
+	\\ and $k(\cdot, x) \in H ~ \forall x \in X$.
+	\item Dirac functional $\delta_x: H \rightarrow \KK$, $\delta_x(f) := f(x)$ is continuous.\\
+	$H$ is called a reproducing kernel Hilbert space.
+	\item Reproducing kernels are kernels.
+\end{itemize} 
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Random Fourier Features}
+Let the function class  $\mathcal{H}_\infty$ be the Reproducing Kernel Hilbert Space (RKHS) corresponding to the Gaussian kernel.\\
+We consider the following non-linear parametric model:
+\begin{block}{Random Fourier Features (RFF) \\ \small{\textit{Random Features for Large-Scale Kernel Machines} (Rahimi et al)}}
+	Let the function class  $\mathcal{H}_N $ consist of functions $h_n : \mathbb{R}^d \to \mathbb{C}$ of the form:
+	\[ h(\cdot) = \sum_{k=1}^{N} a_k\phi(\cdot, v_k) \] 
+	where $\phi(\cdot , v_k) := e^{i
+	\langle v_k , \cdot \rangle }$
+	vectors $v_1, ... , v_N$ are sampled independently from the standard normal distribution in $\mathbb{R}^d$.
+\end{block}
+$H_N$ has $N$ parameters in $\mathbb{C}$, \{ $a_1, ..., a_N$ \}.\\
+As $N \to \infty$, $H_N$ becomes a closer approximation to $\mathcal{H}_\infty$
+\end{frame}
+
+\begin{frame}
+\frametitle{Empirical Evidence - Learning Procedure}
+\begin{itemize}[itemsep = 12pt]
+	\item Given training sample $(x_1, y_1), ..., (x_n, y_n) \in \mathbb{R}^d \times \mathbb{R}$.
+	\item Minimize empirical risk: $\frac{1}{n}\sum_{j=1}^{n}(h(x_j)-y_j)^2$ for $h \in \mathcal{H}_N$.
+	\item When minimizer not unique ($N > n$), choose the minimizer with the coefficients $(a_1, ..., a_N)$ that have the smallest $\ell_2$ norm.
+	\item Let this predictor be: $h_{n,N} \in \mathcal{H}_N$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Min Norm  RKHS solution $h_{n, \infty}$}
+\begin{itemize}[itemsep = 12pt]
+	\item $f^* = \argmin_{f\in\RKHSGauss, f(x_i) = y_i} \norm{f}_{\RKHSGauss}$ 
+	\item $f^*(\cdot) =\sum_{i=1}^{n} \alpha_i k(\cdot, x_i) $ (Representer theorem)
+	\item Since $f^*$ interpolates, $(\alpha_1,..., \alpha_n)^{\Trans} = K^{-1} (y_1,..., y_n)^{\Trans}$
+	\item $\norm{f}_{\RKHSGauss}^2 = \sum_{i,j} \alpha_i \alpha_j K(x_i,x_j) $
+	\begin{block}{Approximation theorem}
+		Fix $h^* \in \mathcal{H}_\infty $  .
+		Let $(x_1,y_1), ..., (x_n,y_n)$ be i.i.d. random variables where $x_i$ drawn randomly from a compact cube $\Omega \subset \mathbb{R}^d $,
+		$y_i = h^*(x_i) \: \forall i$. There exists $A, B > 0$ such that for any interpolating $h \in \mathcal{H}_\infty $ with high probability
+		\[ \sup_{x \in \Omega} \vert h(x) - h^*(x)\vert < A e^{-B(n/log \, n)^{1/d}} (\| h^* \|_{\mathcal{H}_\infty} + \| h \|_{\mathcal{H}_\infty}) \]
+	\end{block}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Empirical Evidence - Results}
+\centering
+\includegraphics[height=7cm]{RFF-results.png}
+\end{frame}
+
+\begin{frame}
+\frametitle{Empirical Evidence - Other Examples}
+\centering
+\includegraphics[height=7cm]{Double_Descent_Examples.png}
+\end{frame}
+
+%\begin{frame}
+%\frametitle{Appendix on Approximation Theorem}
+%\begin{block}{Approximation theorem}
+%	Fix $h^* \in \mathcal{H}_\infty $  .
+%	Let $(x_1,y_1), ..., (x_n,y_n)$ be i.i.d. random variables where $x_i$ drawn randomly from a compact cube $\Omega \subset \mathbb{R}^d $,
+%	$y_i = h^*(x_i) \: \forall i$. There exists $A, B > 0$ such that for any interpolating $h \in \mathcal{H}_\infty $ with high probability
+%	\[ \sup_{x \in \Omega} \vert h(x) - h^*(x)\vert < A e^{-B(n/log \, n)^{1/d}} (\| h^* \|_{\mathcal{H}_\infty} + \| h \|_{\mathcal{H}_\infty}) \]
+%\end{block}
+%\end{frame}
+
+%\begin{frame}
+%\frametitle{Main References}
+%\begin{thebibliography}{1}
+%	\bibitem{Kernel Learning} 
+%	Mikhail Belkin, Siyuan Ma, and Soumik Mandal. 
+%	\textit{To understand deep learning we need to understand kernel learning.} 
+%	In Proceedings of the 25th International Conference on Machine Learning, volume 80 of Proceedings of Machine Learning Research, pages 541-549, 2018.
+%\end{thebibliography}
+%\end{frame}
+\end{document} 
