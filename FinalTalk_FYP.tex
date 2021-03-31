@@ -323,34 +323,56 @@ $\EE_{x,y}[l(\hat{h_n}(x), y)] \leq L_{emp}(\hat{h_n}) + O(\sqrt{c/n})$\
 
 \begin{frame}
 \frametitle{Min Norm  RKHS solution $h_{n, \infty}$}
-\begin{itemize}[itemsep = 12pt]
-	\item $f^* = \argmin_{f\in\RKHSGauss, f(x_i) = y_i} \norm{f}_{\RKHSGauss}$ 
-	\item $f^*(\cdot) =\sum_{i=1}^{n} \alpha_i k(\cdot, x_i) $ (Representer theorem)
-	\item Since $f^*$ interpolates, $(\alpha_1,..., \alpha_n)^{\Trans} = K^{-1} (y_1,..., y_n)^{\Trans}$
-	\item $\norm{f}_{\RKHSGauss}^2 = \sum_{i,j} \alpha_i \alpha_j K(x_i,x_j) $
-	\begin{block}{Approximation theorem}
-		Fix $h^* \in \mathcal{H}_\infty $  .
-		Let $(x_1,y_1), ..., (x_n,y_n)$ be i.i.d. random variables where $x_i$ drawn randomly from a compact cube $\Omega \subset \mathbb{R}^d $,
-		$y_i = h^*(x_i) \: \forall i$. There exists $A, B > 0$ such that for any interpolating $h \in \mathcal{H}_\infty $ with high probability
-		\[ \sup_{x \in \Omega} \vert h(x) - h^*(x)\vert < A e^{-B(n/log \, n)^{1/d}} (\| h^* \|_{\mathcal{H}_\infty} + \| h \|_{\mathcal{H}_\infty}) \]
-	\end{block}
+\begin{block}{Fill Distance}
+The fill distance for a set of points $X = \{x_1, ..., x_N\} \subseteq \Omega$ for a bounded domain $\Omega$ is defined to be
+\[
+h_{X,\Omega} \coloneqq \sup_{x \in \Omega}\min_{1 \leq j \leq N} \norm{x- x_j}_2.
+\]
+\end{block}
+\begin{block}{Approximation theorem}
+For $\HH$ an RKHS corresponding to the Gaussian RBF kernel, fix $h^* \in \HH$  .
+Let $(x_1,y_1), ..., (x_n,y_n)$ be i.i.d. random variables where $x_i$ drawn uniformly at random from a compact cube $\Omega \subseteq \mathbb{R}^d $,
+$y_i = h^*(x_i) \: \forall i$. There exists $A, B > 0$ such that for any interpolating $h \in \HH $ with high probability
+\begin{equation*}
+\sup_{x \in \Omega} \abs{h(x) - h^*(x)} A e^{-B(n/ \log n)^{1/d}} (\norm{ h^*}_{\HH} + \norm{h}_{\HH})
+\end{equation*}
+\end{block}
+
+\end{frame}
+
+\begin{frame}{Proof Sketch}
+\begin{block}{Theorem (Wendland (2004))}
+Let $\Omega$ be a cube in $\RR^d$ and $k = \phi(\norm{\cdot}_2)$ be a positive definite function with $f = \phi(\cdot)$ satisfying the condition that there exists $l_0$ and constant $M > 0$ such that for all $r \geq 0$ and $l \geq l_0$, $|f^{(l)}(r)| \leq l!M^l$. Then there exists a constant $c > 0$ such that the error between a function $f \in \HH$ (where $\HH$ is the RKHS corresponding to the kernel $k$), and its interpolant $s_{f,X}$ for all data points $X = \{x_1, ..., x_n\}$ can be bounded by:
+\begin{equation*}
+\norm{f - s_{f,X}}_{L_\infty(\Omega)} \leq \text{exp}(-c/h_{X,\Omega})\norm{f}_{\HH}
+\end{equation*}
+with sufficiently small fill $h_{X,\Omega}$.
+\end{block}
+\begin{itemize}
+	\item Let $f:= h - h^*$. So $\norm{f}_{\HH} \leq \norm{h}_{\HH} + \norm{h^*}_{\HH}$.
+	\item Use the result (Belkin et al (2019)) that for the points from the compact cube $\Omega$, the fill distance has a high probability to be $O(n/\log n)^{-1/d}$.
 \end{itemize}
 \end{frame}
 
-\begin{frame}
-\frametitle{Empirical Evidence - Other Examples}
-\centering
-\includegraphics[height=7cm]{Double_Descent_Examples.png}
+\begin{frame}{Other Rationale}
+Let the $\RR$-RKHS $\HH$ consist of functions over $X$. The functions fulfill a Lipschitz-like condition with the Lipschitz constant being the RKHS norm of the function $\norm{f}_{\HH}$.\\
+
+\begin{equation*}
+\begin{split}
+|f(x) - f(x')| &= |\inner{f, k(\cdot, x)}_{\HH} - \inner{f, k(\cdot, x')}_{\HH}| \\
+&= |\inner{f, \Phi(x) - \Phi(x')}_{\HH}| ~ \text{ where }  \Phi(x)(\cdot) = k(\cdot, x)\\
+&\leq \norm{f}_{\HH} d(x, x'),
+\end{split}
+\end{equation*}
+where $d(x, x')$ is the pseudometric defined by:
+\[ d^2(x, x') = k(x, x) - 2k(x, x') + k(x', x'). \]
+Intuitively, we can see the "speed" of which the function can change is bounded by the norm of the function in the RKHS space.
 \end{frame}
 
 %\begin{frame}
-%\frametitle{Appendix on Approximation Theorem}
-%\begin{block}{Approximation theorem}
-%	Fix $h^* \in \mathcal{H}_\infty $  .
-%	Let $(x_1,y_1), ..., (x_n,y_n)$ be i.i.d. random variables where $x_i$ drawn randomly from a compact cube $\Omega \subset \mathbb{R}^d $,
-%	$y_i = h^*(x_i) \: \forall i$. There exists $A, B > 0$ such that for any interpolating $h \in \mathcal{H}_\infty $ with high probability
-%	\[ \sup_{x \in \Omega} \vert h(x) - h^*(x)\vert < A e^{-B(n/log \, n)^{1/d}} (\| h^* \|_{\mathcal{H}_\infty} + \| h \|_{\mathcal{H}_\infty}) \]
-%\end{block}
+%\frametitle{Empirical Evidence - Other Examples}
+%\centering
+%\includegraphics[height=7cm]{Double_Descent_Examples.png}
 %\end{frame}
 
 %\begin{frame}
