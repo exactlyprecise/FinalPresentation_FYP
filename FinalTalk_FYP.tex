@@ -15,7 +15,9 @@
 \input{preamble}
 %Information to be included in the title page:
 \title[Introductory Talk] %optional
-{Overfitting and Generalization Performance}
+{Bias-Variance Tradeoff,
+	Overfitting and the Double
+	Descent Curve}
 
 
 
@@ -80,13 +82,6 @@
 	\item Examples: Changing NN architectures, regularization, early stopping.
 \end{itemize}
 \end{frame}
-
-
-%\begin{frame}
-%\frametitle{Generalization of performance}
-%\includegraphics[height=6cm]{UCurve.png}
-%\\Classical curve from bias variance tradeoff.
-%\end{frame}
 
 \begin{frame}
 \frametitle{Modern practice}
@@ -189,6 +184,98 @@ training data points as proven in Scholkopf et al.
 \end{itemize}
 \end{frame}
 
+\begin{frame}{Overfitted and Interpolated Kernel Classifiers}
+\begin{itemize}
+	\item Performed in Belkin et al. (2018b) that show the strong
+	generalization performance also appears in kernel classifiers.
+	\item The aim is to have interpolated solutions which fits the data perfectly, thus having no
+	regularization.
+	\item Though no finite number of functions in the RKHS are able to
+	fit the training data, minimum norm RKHS solutions can be obtained using Representer
+	Theorem.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Training}
+\begin{itemize} \setlength\itemsep{1em}
+	\item Training datapoints $(x_1. y_1), ..., (x_n, y_n) \in \RR^d \times \RR$.
+	\item Let $\HH$ denote the RKHS corresponding to the kernel $k$.
+	\item Let $f^*$ denote the minimum norm interpolant given the datapoints.
+	\item $f^*(\cdot) = \sum_{i=1}^{n} a^*_i k(x_i, \cdot).$
+	\item Due to its interpolating properties, we know that for $a^* := (a^*_1, ..., a^*_n)^\Trans$.
+	\item $\norm{f^*}_\HH = \sum_{i,j=1}^{n} a^*_i a^*_j k(x_i, x_j) = a^{*\Trans} K a^*$
+	\item $a^* = \arg \min_{a} \sum_{i} l((\sum_{j}a_i k(x_j,x_i)) , y_i)$ for some convex loss $l$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Results}
+\begin{itemize} \setlength\itemsep{1em}
+	\item Models were trained till mean square loss on training dataset approaches zero.
+	\item The interpolated solution performed close to optimal.
+	\item The benefits of early stopping regularization were little to none in terms of test
+	regression or classification error.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Interpolated Kernels Performance}
+\includegraphics[height=6cm]{Interpolated_Kernel_1.png}
+\end{frame}
+
+\begin{frame}{Existing Bounds}
+\begin{itemize} \setlength\itemsep{1em}
+	\item How the norm of the classifiers change w.r.t. data size.
+	\item  classifiers are called overfitted if the classification
+	loss for the training set is 0 or near 0, and classifiers are called interpolated when the
+	mean square error is 0 or near 0.
+\end{itemize}
+\begin{block}{t-overfitting}
+For a function $h \in \HH$, and $t \in \RR^+$, it \textbf{t-overfits} the data if it is overfitted with 0 classification loss, and $0 < t< y_ih(x_i)$ for $1\leq i \leq n$.
+\end{block}
+Introduced to prevent arbitrary scaling of solution.
+\end{frame}
+
+\begin{frame}
+\begin{block}{Bounds of t-overfitters}
+	Let $(x_1 ,y_1),..., (x_n,x_n) \in \Omega \times \{-1, 1\}$ be data sampled from probability distribution $P$, and $y$ is not a deterministic function of $x$. With high probability, for any $h$ that t-overfits the data, there exists some constants  $A, B > 0$ depending on $t$, that satisfies
+	\[\norm{h}_\HH > Ae^{Bn^{1/d}}. \]
+\end{block}
+\begin{block}{Classical Bounds}
+	Classical bounds for kernel methods are in the form:
+	\[ \abs{\frac{1}{n} \sum_{i=1}^{n}l(f(x_i),y_i) - L(f)} \leq C_1 \frac{\norm{f}^a_\mathcal{H}}{n^b}, \hspace{1em} C_1, a,b \geq 0 \]
+	The right side on this will tend to infinity for bigger $\norm{f}_\mathcal{H}$.
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Classical Descent Curve}
+\includegraphics[height=6cm]{UCurve.png}
+\\Classical curve from bias variance tradeoff.
+\end{frame}
+
+\begin{frame}
+\frametitle{"Double Descent"}
+\begin{itemize}[itemsep = 12pt]
+	\item "Double Descent" curve proposed and empirically observed to some extent.
+	\item Curve the extends beyond the point of interpolation
+	\item Risk decreases beyond this point, typically surpassing performance of classical stopping point.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Double Descent Curve}
+\includegraphics[height=5cm]{Double-Descent-Curve.png}
+\end{frame}
+\begin{frame}{Random Fourier Features}
+We want to find a randomized feature map $z:\RR^d \rightarrow \RR^D$ such that:
+$k(x,y) = \inner{\phi(x), \phi(y)} \approx \inner{z(x), z(y)}.$
+\begin{block}{}
+(Bochner Rudin (1990)).For a continuous (properly scaled) kernel $k(x - y)$  it is a positive definite kernel if and only if $k(\cdot)$ is the fourier transform of a non-negative measure.
+\end{block}
+\begin{block}{}
+\[ k(x - y) = \int_{\RR^d} p(w) \text{exp}(iw^{\Trans}(x - y)) ~ \text{d}w = \EE_w[e^{iw^{\Trans}x}(e^{iw^{\Trans}y})^*]. \]
+\end{block}
+\end{frame}
 \begin{frame}
 \frametitle{Random Fourier Features}
 Let the function class  $\mathcal{H}_\infty$ be the Reproducing Kernel Hilbert Space (RKHS) corresponding to the Gaussian kernel.\\
@@ -205,37 +292,32 @@ As $N \to \infty$, $H_N$ becomes a closer approximation to $\mathcal{H}_\infty$
 \end{frame}
 
 \begin{frame}
-\frametitle{"Double Descent"}
-\begin{itemize}[itemsep = 12pt]
-	\item "Double Descent" curve proposed and empirically observed to some extent.
-	\item Curve the extends beyond the point of interpolation
-	\item Risk decreases beyond this point, typically surpassing performance of classical stopping point.
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Double Descent Curve}
-\includegraphics[height=5cm]{Double-Descent-Curve.png}
-\end{frame}
-
-\begin{frame}
-\frametitle{Explanations on Double Descent}
-Why should the test risk decrease even when empirical risk stays the same?\\
-\begin{itemize}[itemsep = 12pt]
-\item Capacity of function class needs not suit the appropriate inductive bias for the problem.
-\item By having a larger function class, may find a function that matches the inductive bias better.
-\item Eg., smoother function, smaller norm, larger margin.
-\end{itemize}
-
-\end{frame}
-
-\begin{frame}
 \frametitle{Empirical Evidence - Learning Procedure}
 \begin{itemize}[itemsep = 12pt]
 	\item Given training sample $(x_1, y_1), ..., (x_n, y_n) \in \mathbb{R}^d \times \mathbb{R}$.
 	\item Minimize empirical risk: $\frac{1}{n}\sum_{j=1}^{n}(h(x_j)-y_j)^2$ for $h \in \mathcal{H}_N$.
 	\item When minimizer not unique ($N > n$), choose the minimizer with the coefficients $(a_1, ..., a_N)$ that have the smallest $\ell_2$ norm.
 	\item Let this predictor be: $h_{n,N} \in \mathcal{H}_N$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Empirical Evidence - Results}
+\centering
+\includegraphics[height=7cm]{RFF-results.png}
+\end{frame}
+
+\begin{frame}
+\frametitle{Explanations on Double Descent}
+Why should the test risk decrease even when empirical risk stays the same?\\
+\begin{block}{Classical Bounds}
+$\EE_{x,y}[l(\hat{h_n}(x), y)] \leq L_{emp}(\hat{h_n}) + O(\sqrt{c/n})$\
+\end{block}
+\begin{itemize}[itemsep = 12pt]
+\item The inductive bias of a learning algorithm is the set of assumptions that the learner uses to predict outputs of given inputs that it has not encountered
+\item Capacity of function class needs not suit the appropriate inductive bias for the problem.
+\item By having a larger function class, may find a function that matches the inductive bias better. Eg., smoother function, smaller norm, larger margin.
+\item In this case, a smaller norm.
 \end{itemize}
 \end{frame}
 
@@ -253,12 +335,6 @@ Why should the test risk decrease even when empirical risk stays the same?\\
 		\[ \sup_{x \in \Omega} \vert h(x) - h^*(x)\vert < A e^{-B(n/log \, n)^{1/d}} (\| h^* \|_{\mathcal{H}_\infty} + \| h \|_{\mathcal{H}_\infty}) \]
 	\end{block}
 \end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Empirical Evidence - Results}
-\centering
-\includegraphics[height=7cm]{RFF-results.png}
 \end{frame}
 
 \begin{frame}
