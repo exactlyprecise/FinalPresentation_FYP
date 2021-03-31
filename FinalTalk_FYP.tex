@@ -37,47 +37,56 @@
 \frametitle{Introduction}
 	
 	\begin{block}{General Aim}
-		Given training sample \[(x_1, y_1), ..., (x_n, y_n) \in \mathbb{R}^d \times \mathbb{R}\]
+		Given training sample \[\{(x_1, y_1), ..., (x_n, y_n) \} \in \mathbb{R}^d \times \mathbb{R}\] where $(x_i,y_i)$ are i.i.d. variables drawn from probability distribution $P$,
 		learn a predictor 
-		$h_n : \mathbb{R}^d \to \mathbb{R}$ that predicts $y$ given new $x$.
+		$h_n : \mathbb{R}^d \to \mathbb{R}$ that predicts $y$ "well" given unseen $x$.
 	\end{block}
 	
-	\begin{block}{Empirical Risk Minimization (ERM)}
-		Minimize training risk:
-		$\frac{1}{n} \sum_{i=1}^{n}\ell(h(x_i), y_i) $
-		given a loss function $\ell$.
+	\begin{block}{Loss function $l$}
+		Minimize loss: \\
+		squared-loss function $l(y,\hat{y}) = (\hat{y} - y)^2$\\
+		0-1 loss/ classification loss: $l(\hat{y},y) = 1_{\hat{y} \neq y}$
 	\end{block}
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%
 \begin{frame}
 \frametitle{Generalization}
-
 \begin{itemize}[itemsep = 12pt]
 	\item Find $h_n$ that performs well on unseen data.
 	\item Minimize true risk: $h^*(x) = \argmin_h \EE[\ell (h(x), y)]$ where  $(x, y)$ drawn independently from $P$.
-	\item ERM goal: $h^*_{ERM}(x) = \argmin_{h \in \mathcal{H}} \frac{1}{n} \sum_{i=1}^{n}\ell(h(x_i), y_i) $
+	\item Empirical Risk Minimization (ERM) goal: Minimize training risk. $L_{emp}(h_n) = \frac{1}{n} \sum_{i=1}^{n} l(h_n(x_i), y_i).$
+	\[ \hat{h_n} = \arg\min_{h_n \in \HH} L_{emp}(h_n). \]
 	\item $\mathcal{H}$ is a function class that contains functions approximating $h^*$.
+	\item Classically, we do not choose function $h_n$ that reduces the empirical loss to near zero values, typically due to bounds on the generalization gap.
+	
 \end{itemize}
-
 \end{frame}
 
 \begin{frame}
-\frametitle{"Classical" thinking}
+\frametitle{Bias Variance Tradeoff}
 \begin{itemize}[itemsep = 12pt]
 	\item Finding a balance between underfitting and overfitting.
 	\item "Bias-Variance Tradeoff"
 	\item 0 training error does not tend to generalize well.
-	\item Control function class $\mathcal{H}$ implicitly or explicitly.
+\end{itemize}
+\begin{block}{Generalization Error}
+	Difference Between empirical and expected classifier loss:
+	$\EE_{x,y}[l(\hat{h_n}(x), y)] \leq L_{emp}(\hat{h_n}) + O(\sqrt{c/n})$\\
+	where $c$ is some  measure of the complexity of $\HH$, for example the fat-shattering dimension, VC-dimension, etc.
+\end{block}
+\begin{itemize}[itemsep = 12pt]
+	\item To control $L_{emp}$ and $c$, control $\HH$ implicitly or explicitly.
+	\item Examples: Changing NN architectures, regularization, early stopping.
 \end{itemize}
 \end{frame}
 
 
-\begin{frame}
-\frametitle{Generalization of performance}
-\includegraphics[height=6cm]{UCurve.png}
-\\Classical curve from bias variance tradeoff.
-\end{frame}
+%\begin{frame}
+%\frametitle{Generalization of performance}
+%\includegraphics[height=6cm]{UCurve.png}
+%\\Classical curve from bias variance tradeoff.
+%\end{frame}
 
 \begin{frame}
 \frametitle{Modern practice}
@@ -91,6 +100,108 @@
 \begin{frame}
 \includegraphics[width=11cm]{Good_Interpolation_Zhang.png}
 \\ \textit{Understanding Deep Learning Requires Rethinking Generalization, Zhang et al} 
+\end{frame}
+
+\begin{frame}
+\frametitle{Question}
+\begin{itemize}[itemsep = 12pt]
+	\item Unanswered as to why these overparameterized data do not seem to cause
+	high test loss due to overfitting.
+	\item Papers discussed further show empirically that this
+	property is not exclusive to deep learning, but also seems to appear in learning for kernel
+	machines as well.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Short introduction to Kernels and RKHS}
+\begin{itemize}[itemsep = 12pt]
+	\item Where $\KK$ may refer to either $\RR$ or $\CC$.
+	\item For kernel $k: X \times X \rightarrow \KK $, there exists $\KK$-Hilbert space $\HH$ and map $\psi:X \rightarrow \HH$ such that for all $x_1, x_2 \in X$,
+	\[ k(x_1, x_2) = \inner{\psi(x_2), \psi(x_1)}. \] 
+	\item $\psi$ is called a feature map of $k$.
+	\item (Real) Gaussian RBF kernel with width $\gamma$:
+	\[ k_{\gamma}(x, x') := e^{\frac{-\norm{x - x'}_2^2}{\gamma^2}}. \]
+	where $x, x' \in \RR^d$.
+\end{itemize}
+\end{frame}
+\begin{frame}
+\begin{block}{Positive Definite Functions}
+	For a non-empty set $X$, a function $k: X \times X \rightarrow \RR$ is said to be a positive definite if, for all $x_1, ..., x_n \in X$, for all $a_1, ..., a_n \in \RR$, we have:
+	\[ \sum_{j=1}^{n} \sum_{i=1}^{n} a_j a_i k(x_j, x_i) \geq 0. \]
+\end{block}
+\begin{block}{Positive Definite Symmetric Functions are Kernels}
+A real function $k:X \times X \rightarrow \RR$ is a kernel if and only if $k$ is a positive definite symmetric function.
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Short introduction to Kernels and RKHS}
+Reproducing kernel Hilbert spaces have many applications in the fields such as Statistical Learning and complex analysis. An RKHS is a
+K-Hilbert function space where point evaluation is continuous linear funcitonal.
+
+\begin{block}{Reproducing Kernel Hilbert Spaces (\textbf{RKHS}) Definition}
+Let $\mathcal{H}$ be a $\KK$-Hilbert space of functions over a non-empty set $X$. $\HH$ is called an RKHS over $X$ if the Dirac function $\delta_x: \HH \rightarrow \KK$ defined as:
+\[ \delta_x(f) := f(x), ~ x \in X, ~ f \in \HH \] is continuous.
+\end{block}
+\end{frame}
+
+\begin{frame}
+\begin{block}{Reproducing Kernels}
+For a non-empty set $X$ and a function $k : X \times X \rightarrow \KK$ $k$ is called a reproducing kernel of $\HH$ (a Hilbert function space) if $k(\cdot, x) \in \HH$ for all $x \in X$ and the following property hold for all $x \in X$ and $f \in \HH$:
+\begin{equation*}
+f(x) = \inner{f, k(\cdot, x)}
+\end{equation*}
+This condition is also known as the reproducing property. 
+\end{block}
+\begin{itemize}
+	\item It can be shown that $k$ is a kernel.
+	\item $\HH$ is then an RKHS.
+\end{itemize}
+\end{frame}
+
+\begin{frame} \frametitle{Representer Theorem}
+Representer Theorem ensures that the argmin of an empirical risk expression involving a
+function over an RKHS can be expressed as a linear combination of kernels applied on the
+training data points as proven in Scholkopf et al.
+\end{frame}
+
+\begin{frame}
+\begin{block}{Representer Theorem}
+	Training data $(x_1,y_1), ... (x_n,y_n) \in X \times \RR$, and RKHS $\mathcal{H}$ a $\RR$-Hilbert function space over $X$ with reproducing kernel $k:X \times X \rightarrow \RR$.\\ Let $g$ be a strictly increasing function $g:[0, \infty]\rightarrow \RR$, and $l:(X \times \RR^2)^n \rightarrow \RR \cup \{\infty\}$ be an arbitrary loss function. \\
+	We want to minimize the following empirical risk term:
+	$L_{emp}(f, (x_1, y_1), ..., (x_n, y_n)) ~ := ~ l((x_1, y_1, f(x_1)), ..., (x_n, y_n, f(x_n))) + g(\norm{f})$\\
+	For $\hat{f} = \arg \min_{f \in \mathcal{H}} L_{emp}(f, (x_1, y_1), ..., (x_n, y_n))$, $\hat{f}$ can be represented in the form:
+	\[ \hat{f}(\cdot) = \sum_{i=1}^{n} a_i k(\cdot, x_i) \]
+	with $a_i \in \RR$ for $1 \leq i \leq n$.
+\end{block}
+\end{frame}
+
+\begin{frame} \frametitle{Proof Sketch}
+\begin{itemize} \setlength\itemsep{1em}
+	\item Let $\Phi(x)(\cdot) = k(\cdot , x)$.
+	\item $f = \sum_{i=1}^{n} a_i \Phi(x_i) + \gamma$, where $\inner{\Phi(x_i), \gamma} = 0$
+	\item $f(x_j) = \sum_{i=1}^{n} a_i \inner{\Phi(x_i),  \Phi(x_j)}$
+	\item So $f(x_j)$ is unaffected by $\gamma$.
+	\item $\norm{f}^2 = \norm{\sum_{i=1}^{n} a_i \Phi(x_i) + \gamma}^2 \geq \norm{\sum_{i=1}^{n} a_i \Phi(x_i)}^2$
+	\item $g(\norm{f}) \geq g(\norm{\sum_{i=1}^{n} a_i \Phi(x_i)})$
+	\item So $\gamma = 0$ and $\hat{f} = \sum_{i=1}^{n} a_i k(\cdot, x_i)$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Random Fourier Features}
+Let the function class  $\mathcal{H}_\infty$ be the Reproducing Kernel Hilbert Space (RKHS) corresponding to the Gaussian kernel.\\
+We consider the following non-linear parametric model:
+\begin{block}{Random Fourier Features (RFF) \\ \small{\textit{Random Features for Large-Scale Kernel Machines} (Rahimi et al)}}
+	Let the function class  $\mathcal{H}_N $ consist of functions $h_n : \mathbb{R}^d \to \mathbb{C}$ of the form:
+	\[ h(\cdot) = \sum_{k=1}^{N} a_k\phi(\cdot, v_k) \] 
+	where $\phi(\cdot , v_k) := e^{i
+	\langle v_k , \cdot \rangle }$
+	vectors $v_1, ... , v_N$ are sampled independently from the standard normal distribution in $\mathbb{R}^d$.
+\end{block}
+$H_N$ has $N$ parameters in $\mathbb{C}$, \{ $a_1, ..., a_N$ \}.\\
+As $N \to \infty$, $H_N$ becomes a closer approximation to $\mathcal{H}_\infty$
 \end{frame}
 
 \begin{frame}
@@ -111,50 +222,11 @@
 \frametitle{Explanations on Double Descent}
 Why should the test risk decrease even when empirical risk stays the same?\\
 \begin{itemize}[itemsep = 12pt]
-	\item Capacity of function class needs not suit the appropriate inductive bias for the problem.
-	\item By having a larger function class, may find a function that matches the inductive bias better.
-	\item Eg., smoother function, smaller norm, larger margin.
+\item Capacity of function class needs not suit the appropriate inductive bias for the problem.
+\item By having a larger function class, may find a function that matches the inductive bias better.
+\item Eg., smoother function, smaller norm, larger margin.
 \end{itemize}
 
-\end{frame}
-
-\begin{frame}
-\frametitle{Short introduction to Kernels and RKHS}
-\begin{itemize}[itemsep = 12pt]
-	\item For kernel $k: X \times X \rightarrow \KK $, there exists $\KK$-Hilbert space $H$ and map $\psi:X \rightarrow H$ such that for all $x_1, x_2 \in X$,
-	\[ k(x_1, x_2) = \inner{\psi(x_2), \psi(x_1)}. \] 
-	\item $\psi$ is called a feature map of $k$.
-	\item Gaussian RBF kernel with width $\gamma$:
-	\[ k_{\gamma, \CC^d}(x, x') := e^{\frac{-\norm{x - x'}_2^2}{\gamma^2}}. \]
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Short introduction to Kernels and RKHS}
-Let $H$ be a $\KK$-Hilbert space, consisting of functions $f: X \rightarrow K$.
-\begin{itemize}
-	\item Function $k:X \times X \rightarrow \KK$ is a reproducing kernel of $H$ if $f(x) = \inner{f, k(\cdot, x)} ~ \forall f \in H, ~ \forall  x \in X $ 
-	\\ and $k(\cdot, x) \in H ~ \forall x \in X$.
-	\item Dirac functional $\delta_x: H \rightarrow \KK$, $\delta_x(f) := f(x)$ is continuous.\\
-	$H$ is called a reproducing kernel Hilbert space.
-	\item Reproducing kernels are kernels.
-\end{itemize} 
-
-\end{frame}
-
-\begin{frame}
-\frametitle{Random Fourier Features}
-Let the function class  $\mathcal{H}_\infty$ be the Reproducing Kernel Hilbert Space (RKHS) corresponding to the Gaussian kernel.\\
-We consider the following non-linear parametric model:
-\begin{block}{Random Fourier Features (RFF) \\ \small{\textit{Random Features for Large-Scale Kernel Machines} (Rahimi et al)}}
-	Let the function class  $\mathcal{H}_N $ consist of functions $h_n : \mathbb{R}^d \to \mathbb{C}$ of the form:
-	\[ h(\cdot) = \sum_{k=1}^{N} a_k\phi(\cdot, v_k) \] 
-	where $\phi(\cdot , v_k) := e^{i
-	\langle v_k , \cdot \rangle }$
-	vectors $v_1, ... , v_N$ are sampled independently from the standard normal distribution in $\mathbb{R}^d$.
-\end{block}
-$H_N$ has $N$ parameters in $\mathbb{C}$, \{ $a_1, ..., a_N$ \}.\\
-As $N \to \infty$, $H_N$ becomes a closer approximation to $\mathcal{H}_\infty$
 \end{frame}
 
 \begin{frame}
